@@ -10,12 +10,46 @@ import (
 
 // IdlerSpec defines the desired state of Idler
 type IdlerSpec struct {
-	// INSERT YOUR CODE HERE - define desired state schema
+	// WantIdle represents the desired state of idling
+	WantIdle bool
+	// TargetScalables contains the collection of scalables that
+	// are idled/unidled together.
+	TargetScalables []CrossGroupObjectReference
+	// TriggerServiceNames contains the collection of services that shold
+	// trigger unidling.  Their corresponding endpoints objects will be
+	// used to determine whether or not unidling is successful.
+	TriggerServiceNames []string
 }
 
 // IdlerStatus defines the observed state of Idler
 type IdlerStatus struct {
-	// INSERT YOUR CODE HERE - define observed state schema
+	// Idled represents the current state of idling
+	Idled bool
+	// UnidleScales contains the previous scales of idled scalables
+	UnidledScales []UnidleInfo
+}
+
+// UnidleInfo represents the information needed to restore an idled object
+// to its unidled state.
+type UnidleInfo struct {
+	CrossGroupObjectReference
+	// PreviousScale represents the replica count of this object before it
+	// was idled.
+	PreviousScale int32
+}
+
+// CrossGroupObjectReference references an object in the same namespace as
+// the current "context", but potentially in a different API group.
+type CrossGroupObjectReference struct {
+	// TODO(directxman12): ask deads/liggitt if we're still
+	// going to fight the Group vs APIVersion battle...
+
+	// Group is the API group that the given resource belongs to.
+	Group string
+	// Resource is the type of resource that this references.
+	Resource string
+	// Name is the name of the object that we're referencing.
+	Name string
 }
 
 // +genclient

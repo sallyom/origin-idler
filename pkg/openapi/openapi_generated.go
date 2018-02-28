@@ -14,6 +14,38 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
+		"github.com/openshift/origin-idler/pkg/apis/idling/v1alpha2.CrossGroupObjectReference": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Description: "CrossGroupObjectReference references an object in the same namespace as the current \"context\", but potentially in a different API group.",
+					Properties: map[string]spec.Schema{
+						"Group": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Group is the API group that the given resource belongs to.",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"Resource": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Resource is the type of resource that this references.",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"Name": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Name is the name of the object that we're referencing.",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+					},
+					Required: []string{"Group", "Resource", "Name"},
+				},
+			},
+			Dependencies: []string{},
+		},
 		"github.com/openshift/origin-idler/pkg/apis/idling/v1alpha2.Idler": {
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
@@ -117,19 +149,79 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
 					Description: "IdlerSpec defines the desired state of Idler",
-					Properties:  map[string]spec.Schema{},
+					Properties: map[string]spec.Schema{
+						"WantIdle": {
+							SchemaProps: spec.SchemaProps{
+								Description: "WantIdle represents the desired state of idling",
+								Type:        []string{"boolean"},
+								Format:      "",
+							},
+						},
+						"TargetScalables": {
+							SchemaProps: spec.SchemaProps{
+								Description: "TargetScalables contains the collection of scalables that are idled/unidled together.",
+								Type:        []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Ref: ref("github.com/openshift/origin-idler/pkg/apis/idling/v1alpha2.CrossGroupObjectReference"),
+										},
+									},
+								},
+							},
+						},
+						"TriggerServiceNames": {
+							SchemaProps: spec.SchemaProps{
+								Description: "TriggerServiceNames contains the collection of services that shold trigger unidling.  Their corresponding endpoints objects will be used to determine whether or not unidling is successful.",
+								Type:        []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Type:   []string{"string"},
+											Format: "",
+										},
+									},
+								},
+							},
+						},
+					},
+					Required: []string{"WantIdle", "TargetScalables", "TriggerServiceNames"},
 				},
 			},
-			Dependencies: []string{},
+			Dependencies: []string{
+				"github.com/openshift/origin-idler/pkg/apis/idling/v1alpha2.CrossGroupObjectReference"},
 		},
 		"github.com/openshift/origin-idler/pkg/apis/idling/v1alpha2.IdlerStatus": {
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
 					Description: "IdlerStatus defines the observed state of Idler",
-					Properties:  map[string]spec.Schema{},
+					Properties: map[string]spec.Schema{
+						"Idled": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Idled represents the current state of idling",
+								Type:        []string{"boolean"},
+								Format:      "",
+							},
+						},
+						"UnidledScales": {
+							SchemaProps: spec.SchemaProps{
+								Description: "UnidleScales contains the previous scales of idled scalables",
+								Type:        []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Ref: ref("github.com/openshift/origin-idler/pkg/apis/idling/v1alpha2.UnidleInfo"),
+										},
+									},
+								},
+							},
+						},
+					},
+					Required: []string{"Idled", "UnidledScales"},
 				},
 			},
-			Dependencies: []string{},
+			Dependencies: []string{
+				"github.com/openshift/origin-idler/pkg/apis/idling/v1alpha2.UnidleInfo"},
 		},
 		"github.com/openshift/origin-idler/pkg/apis/idling/v1alpha2.IdlerStatusStrategy": {
 			Schema: spec.Schema{
@@ -162,6 +254,30 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 			},
 			Dependencies: []string{
 				"github.com/kubernetes-sigs/kubebuilder/pkg/builders.DefaultStorageStrategy"},
+		},
+		"github.com/openshift/origin-idler/pkg/apis/idling/v1alpha2.UnidleInfo": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Description: "UnidleInfo represents the information needed to restore an idled object to its unidled state.",
+					Properties: map[string]spec.Schema{
+						"CrossGroupObjectReference": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("github.com/openshift/origin-idler/pkg/apis/idling/v1alpha2.CrossGroupObjectReference"),
+							},
+						},
+						"PreviousScale": {
+							SchemaProps: spec.SchemaProps{
+								Description: "PreviousScale represents the replica count of this object before it was idled.",
+								Type:        []string{"integer"},
+								Format:      "int32",
+							},
+						},
+					},
+					Required: []string{"CrossGroupObjectReference", "PreviousScale"},
+				},
+			},
+			Dependencies: []string{
+				"github.com/openshift/origin-idler/pkg/apis/idling/v1alpha2.CrossGroupObjectReference"},
 		},
 		"k8s.io/api/admissionregistration/v1alpha1.Initializer": {
 			Schema: spec.Schema{
@@ -22314,15 +22430,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
 					Description: "Duration is a wrapper around time.Duration which supports correct marshaling to YAML and JSON. In particular, it marshals into strings, which can be used as map keys in json.",
-					Properties: map[string]spec.Schema{
-						"Duration": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"integer"},
-								Format: "int64",
-							},
-						},
-					},
-					Required: []string{"Duration"},
+					Properties:  map[string]spec.Schema{},
 				},
 			},
 			Dependencies: []string{},

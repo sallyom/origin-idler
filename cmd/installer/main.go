@@ -1,14 +1,11 @@
-
-
-
 package main
 
 import (
-    "flag"
-    "log"
+	"flag"
+	"log"
 
-    "github.com/kubernetes-sigs/kubebuilder/pkg/install"
-    controllerlib "github.com/kubernetes-sigs/kubebuilder/pkg/controller"
+	controllerlib "github.com/kubernetes-sigs/kubebuilder/pkg/controller"
+	"github.com/kubernetes-sigs/kubebuilder/pkg/install"
 
 	"github.com/openshift/origin-idler/pkg/apis"
 )
@@ -22,41 +19,41 @@ var apiserverAggregation = flag.Bool("apiserver-aggregation", false, "use apiser
 var uninstall = flag.Bool("uninstall", false, "uninstall the API")
 
 func main() {
-    flag.Parse()
-    config, err := controllerlib.GetConfig(*kubeconfig)
-    if err != nil {
-        log.Fatalf("Could not create Config for talking to the apiserver: %v", err)
-    }
+	flag.Parse()
+	config, err := controllerlib.GetConfig(*kubeconfig)
+	if err != nil {
+		log.Fatalf("Could not create Config for talking to the apiserver: %v", err)
+	}
 
-    // Install the API components into the cluster
-    var strategy install.InstallStrategy
-        if *apiserverAggregation {
-            // Do not use - doesn't work yet
-            strategy = &install.ApiserverInstallStrategy{
-                Name: *name,
-                APIMeta: apis.APIMeta,
-                ApiserverImage: *apiserverImage,
-                ControllerManagerImage: *controllerImage,
-                DocsImage: *docsImage,
-            }
-        } else {
-            strategy = &install.CRDInstallStrategy{
-                Name: *name,
-                APIMeta: apis.APIMeta,
-                ControllerManagerImage: *controllerImage,
-                DocsImage: *docsImage,
-            }
-        }
+	// Install the API components into the cluster
+	var strategy install.InstallStrategy
+	if *apiserverAggregation {
+		// Do not use - doesn't work yet
+		strategy = &install.ApiserverInstallStrategy{
+			Name:                   *name,
+			APIMeta:                apis.APIMeta,
+			ApiserverImage:         *apiserverImage,
+			ControllerManagerImage: *controllerImage,
+			DocsImage:              *docsImage,
+		}
+	} else {
+		strategy = &install.CRDInstallStrategy{
+			Name:                   *name,
+			APIMeta:                apis.APIMeta,
+			ControllerManagerImage: *controllerImage,
+			DocsImage:              *docsImage,
+		}
+	}
 
-    if !*uninstall {
-        err = install.NewInstaller(config).Install(strategy)
-        if err != nil {
-            log.Fatalf("Failed to install API: %v", err)
-        }
-    } else {
-        err = install.NewUninstaller(config).Uninstall(strategy)
-        if err != nil {
-            log.Fatalf("Failed to uninstall API: %v", err)
-        }
-    }
+	if !*uninstall {
+		err = install.NewInstaller(config).Install(strategy)
+		if err != nil {
+			log.Fatalf("Failed to install API: %v", err)
+		}
+	} else {
+		err = install.NewUninstaller(config).Uninstall(strategy)
+		if err != nil {
+			log.Fatalf("Failed to uninstall API: %v", err)
+		}
+	}
 }

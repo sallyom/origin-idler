@@ -1,6 +1,3 @@
-
-
-
 package main
 
 import (
@@ -11,8 +8,8 @@ import (
 	"github.com/kubernetes-sigs/kubebuilder/pkg/install"
 	extensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 
-	"github.com/openshift/origin-idler/pkg/controller"
 	"github.com/openshift/origin-idler/pkg/apis"
+	"github.com/openshift/origin-idler/pkg/controller"
 )
 
 var kubeconfig = flag.String("kubeconfig", "", "path to kubeconfig")
@@ -26,14 +23,14 @@ func main() {
 		log.Fatalf("Could not create Config for talking to the apiserver: %v", err)
 	}
 
-    if *installCRDs {
-        err = install.NewInstaller(config).Install(&InstallStrategy{crds: apis.APIMeta.GetCRDs()})
-        if err != nil {
-            log.Fatalf("Could not create CRDs: %v", err)
-        }
-    }
+	if *installCRDs {
+		err = install.NewInstaller(config).Install(&InstallStrategy{crds: apis.APIMeta.GetCRDs()})
+		if err != nil {
+			log.Fatalf("Could not create CRDs: %v", err)
+		}
+	}
 
-    // Start the controllers
+	// Start the controllers
 	controllers, _ := controller.GetAllControllers(config)
 	controllerlib.StartControllerManager(controllers...)
 

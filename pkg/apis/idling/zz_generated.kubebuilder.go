@@ -60,9 +60,25 @@ type Idler struct {
 }
 
 type IdlerSpec struct {
+	WantIdle            bool
+	TargetScalables     []CrossGroupObjectReference
+	TriggerServiceNames []string
 }
 
 type IdlerStatus struct {
+	Idled         bool
+	UnidledScales []UnidleInfo
+}
+
+type CrossGroupObjectReference struct {
+	Group    string
+	Resource string
+	Name     string
+}
+
+type UnidleInfo struct {
+	CrossGroupObjectReference
+	PreviousScale int32
 }
 
 //
