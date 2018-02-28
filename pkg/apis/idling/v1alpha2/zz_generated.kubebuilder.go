@@ -27,16 +27,16 @@ var (
 				OpenAPIV3Schema: &v1beta1.JSONSchemaProps{
 					Type: "object",
 					Properties: map[string]v1beta1.JSONSchemaProps{
-						"apiVersion": v1beta1.JSONSchemaProps{Type: "string"},
-						"kind":       v1beta1.JSONSchemaProps{Type: "string"},
-						"metadata": v1beta1.JSONSchemaProps{
+						"apiVersion": {Type: "string"},
+						"kind":       {Type: "string"},
+						"metadata": {
 							Type: "object",
 						},
-						"spec": v1beta1.JSONSchemaProps{
+						"spec": {
 							Type:       "object",
 							Properties: map[string]v1beta1.JSONSchemaProps{},
 						},
-						"status": v1beta1.JSONSchemaProps{
+						"status": {
 							Type:       "object",
 							Properties: map[string]v1beta1.JSONSchemaProps{},
 						},

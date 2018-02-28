@@ -1,10 +1,7 @@
-
-
-
 package v1alpha2
 
 import (
-    metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // EDIT THIS FILE!
@@ -13,12 +10,12 @@ import (
 
 // IdlerSpec defines the desired state of Idler
 type IdlerSpec struct {
-    // INSERT YOUR CODE HERE - define desired state schema
+	// INSERT YOUR CODE HERE - define desired state schema
 }
 
 // IdlerStatus defines the observed state of Idler
 type IdlerStatus struct {
-    // INSERT YOUR CODE HERE - define observed state schema
+	// INSERT YOUR CODE HERE - define observed state schema
 }
 
 // +genclient
@@ -28,9 +25,9 @@ type IdlerStatus struct {
 // +k8s:openapi-gen=true
 // +resource:path=idlers
 type Idler struct {
-    metav1.TypeMeta   `json:",inline"`
-    metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-    Spec   IdlerSpec   `json:"spec,omitempty"`
-    Status IdlerStatus `json:"status,omitempty"`
+	Spec   IdlerSpec   `json:"spec,omitempty"`
+	Status IdlerStatus `json:"status,omitempty"`
 }

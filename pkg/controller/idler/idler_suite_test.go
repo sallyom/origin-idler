@@ -1,20 +1,17 @@
-
-
-
 package idler_test
 
 import (
-    "testing"
+	"testing"
 
-    . "github.com/onsi/ginkgo"
-    . "github.com/onsi/gomega"
-    "k8s.io/client-go/rest"
-    "github.com/kubernetes-sigs/kubebuilder/pkg/test"
+	"github.com/kubernetes-sigs/kubebuilder/pkg/test"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"k8s.io/client-go/rest"
 
-    "github.com/openshift/origin-idler/pkg/apis"
-    "github.com/openshift/origin-idler/pkg/client/clientset_generated/clientset"
-    "github.com/openshift/origin-idler/pkg/controller/sharedinformers"
-    "github.com/openshift/origin-idler/pkg/controller/idler"
+	"github.com/openshift/origin-idler/pkg/apis"
+	"github.com/openshift/origin-idler/pkg/client/clientset_generated/clientset"
+	"github.com/openshift/origin-idler/pkg/controller/idler"
+	"github.com/openshift/origin-idler/pkg/controller/sharedinformers"
 )
 
 var testenv *test.TestEnvironment
@@ -25,23 +22,23 @@ var controller *idler.IdlerController
 var si *sharedinformers.SharedInformers
 
 func TestIdler(t *testing.T) {
-    RegisterFailHandler(Fail)
-    RunSpecsWithDefaultAndCustomReporters(t, "Idler Suite", []Reporter{test.NewlineReporter{}})
+	RegisterFailHandler(Fail)
+	RunSpecsWithDefaultAndCustomReporters(t, "Idler Suite", []Reporter{test.NewlineReporter{}})
 }
 
 var _ = BeforeSuite(func() {
-    testenv = &test.TestEnvironment{CRDs: apis.APIMeta.GetCRDs()}
-    var err error
-    config, err = testenv.Start()
-    Expect(err).NotTo(HaveOccurred())
-    cs = clientset.NewForConfigOrDie(config)
+	testenv = &test.TestEnvironment{CRDs: apis.APIMeta.GetCRDs()}
+	var err error
+	config, err = testenv.Start()
+	Expect(err).NotTo(HaveOccurred())
+	cs = clientset.NewForConfigOrDie(config)
 
-    shutdown = make(chan struct{})
-    si = sharedinformers.NewSharedInformers(config, shutdown)
-    controller = idler.NewIdlerController(config, si)
-    controller.Run(shutdown)
+	shutdown = make(chan struct{})
+	si = sharedinformers.NewSharedInformers(config, shutdown)
+	controller = idler.NewIdlerController(config, si)
+	controller.Run(shutdown)
 })
 
 var _ = AfterSuite(func() {
-    testenv.Stop()
+	testenv.Stop()
 })
