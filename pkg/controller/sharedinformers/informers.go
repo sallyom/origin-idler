@@ -15,6 +15,5 @@ func (si *SharedInformers) StartAdditionalInformers(shutdown <-chan struct{}) {
 
 	// Uncomment this to start listening for Deployment Create / Update / Deletes
 	// go si.KubernetesFactory.Apps().V1beta1().Deployments().Informer().Run(shutdown)
-
-	// INSERT YOUR CODE HERE - start additional shared informers
+	go si.KubernetesFactory().Core().V1().Endpoints().Informer().Run(shutdown)
 }
